@@ -26,7 +26,6 @@ namespace DogGo.Repositories
 
         public List<Owner> GetAllOwners()
         {
-
             using (SqlConnection conn = Connection)
             {
                 List<Owner> owners = new List<Owner>();
@@ -34,8 +33,9 @@ namespace DogGo.Repositories
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                        SELECT o.Id, o.[Name], o.Email, o.Address, o.NeighborhoodId, o.Phone
+                        SELECT o.Id, o.[Name], o.Email, o.Address, o.NeighborhoodId, o.Phone, n.Name AS NeighborhoodName
                         FROM Owner o
+                        JOIN Neighborhood n ON n.Id = o.NeighborhoodId
                         ";
 
                     using (SqlDataReader reader = cmd.ExecuteReader())
@@ -52,6 +52,13 @@ namespace DogGo.Repositories
                                 NeighborhoodId = reader.GetInt32(reader.GetOrdinal("NeighborhoodId")),
                                 Phone = reader.GetString(reader.GetOrdinal("Phone"))
                             };
+                            if(!reader.IsDBNull(reader.GetOrdinal("NeighborhoodId")))
+                            {
+                                owner.Neighborhood = new Neighborhood
+                                {
+                                    Name = reader.GetString(reader.GetOrdinal("NeighborhoodName"))
+                                };
+                            }
                             owners.Add(owner);
                         }
                     }

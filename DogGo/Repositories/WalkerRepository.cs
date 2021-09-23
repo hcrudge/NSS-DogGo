@@ -31,6 +31,7 @@ namespace DogGo.Repositories
         {
             using (SqlConnection conn = Connection)
             {
+                List<Walker> walkers = new List<Walker>();
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
@@ -40,32 +41,33 @@ namespace DogGo.Repositories
                         JOIN Neighborhood n ON n.Id = w.NeighborhoodId
                         ";
 
-                    SqlDataReader reader = cmd.ExecuteReader();
-
-                    List<Walker> walkers = new List<Walker>();
-                    while (reader.Read())
+                    using (SqlDataReader reader = cmd.ExecuteReader())
                     {
-                        Walker walker = new Walker
-                        {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            Name = reader.GetString(reader.GetOrdinal("Name")),
-                            ImageUrl = reader.GetString(reader.GetOrdinal("ImageUrl")),
-                            NeighborhoodId = reader.GetInt32(reader.GetOrdinal("NeighborhoodId"))
-                        };
 
-
-                        if (!reader.IsDBNull(reader.GetOrdinal("NeighborhoodId")))
+                        while (reader.Read())
                         {
-                            walker.Neighborhood = new Neighborhood
+                            Walker walker = new Walker
                             {
-                                Name = reader.GetString(reader.GetOrdinal("NeighborhoodName"))
-
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                Name = reader.GetString(reader.GetOrdinal("Name")),
+                                ImageUrl = reader.GetString(reader.GetOrdinal("ImageUrl")),
+                                NeighborhoodId = reader.GetInt32(reader.GetOrdinal("NeighborhoodId"))
                             };
 
-                        };
-                        walkers.Add(walker);
+
+                            if (!reader.IsDBNull(reader.GetOrdinal("NeighborhoodId")))
+                            {
+                                walker.Neighborhood = new Neighborhood
+                                {
+                                    Name = reader.GetString(reader.GetOrdinal("NeighborhoodName"))
+
+                                };
+
+                            };
+                            walkers.Add(walker);
+                        }
                     }
-                    reader.Close();
+
                     return walkers;
                 }
             }
@@ -149,6 +151,8 @@ namespace DogGo.Repositories
                 }
             }
         }
+
+        
 
     }
 }
