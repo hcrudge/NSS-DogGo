@@ -17,7 +17,7 @@ namespace DogGo.Models.ViewModels
                 var totalDuration = Walks.Select(w => w.Duration).Sum();
                 var hours = totalDuration / 3600;
                 var minutes = totalDuration % 3600 / 60;
-                return $"{hours}hours :{minutes} minutes";
+                return $"{hours}hours : {minutes} minutes";
             }
         }
 
